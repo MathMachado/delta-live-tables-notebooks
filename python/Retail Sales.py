@@ -66,13 +66,19 @@ def sales_orders_cleaned():
   }
 )
 def sales_order_in_la():
-  df = dlt.read_stream("sales_orders_cleaned").where("city == 'Los Angeles'") 
+  df = dlt.read_stream("sales_orders_cleaned").where("city == 'Los Angeles'")
   df = df.select(df.city, df.order_date, df.customer_id, df.customer_name, explode(df.ordered_products).alias("ordered_products_explode"))
 
-  dfAgg = df.groupBy(df.order_date, df.city, df.customer_id, df.customer_name, df.ordered_products_explode.curr.alias("currency"))\
-    .agg(sum(df.ordered_products_explode.price).alias("sales"), sum(df.ordered_products_explode.qty).alias("qantity"))
-
-  return dfAgg
+  return df.groupBy(
+      df.order_date,
+      df.city,
+      df.customer_id,
+      df.customer_name,
+      df.ordered_products_explode.curr.alias("currency"),
+  ).agg(
+      sum(df.ordered_products_explode.price).alias("sales"),
+      sum(df.ordered_products_explode.qty).alias("qantity"),
+  )
 
 
 # COMMAND ----------
@@ -85,10 +91,16 @@ def sales_order_in_la():
   }
 )
 def sales_order_in_chicago():
-  df = dlt.read_stream("sales_orders_cleaned").where("city == 'Chicago'") 
+  df = dlt.read_stream("sales_orders_cleaned").where("city == 'Chicago'")
   df = df.select(df.city, df.order_date, df.customer_id, df.customer_name, explode(df.ordered_products).alias("ordered_products_explode"))
 
-  dfAgg = df.groupBy(df.order_date, df.city, df.customer_id, df.customer_name, df.ordered_products_explode.curr.alias("currency"))\
-    .agg(sum(df.ordered_products_explode.price).alias("sales"), sum(df.ordered_products_explode.qty).alias("qantity"))
-
-  return dfAgg
+  return df.groupBy(
+      df.order_date,
+      df.city,
+      df.customer_id,
+      df.customer_name,
+      df.ordered_products_explode.curr.alias("currency"),
+  ).agg(
+      sum(df.ordered_products_explode.price).alias("sales"),
+      sum(df.ordered_products_explode.qty).alias("qantity"),
+  )

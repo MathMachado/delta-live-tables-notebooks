@@ -47,7 +47,7 @@ try:
   dbutils.fs.put(f"{api_resp_path}/station_status_{fmt_now}.json", "")
 except:
   print('File already exists')
-  
+
 # Call API & get JSON response:
 #----------------------------------------------------------
 resp = requests.get(station_status)
@@ -59,6 +59,6 @@ print("Response Status Code : ", resp.status_code)
 resp_json_str = resp.content.decode("utf-8")
 print("Byte size of JSON Response: ", len(resp_json_str))
 #----------------------------------------------------------
-  
+
 with open(f"/dbfs/{api_resp_path}/station_status_{fmt_now}.json","w") as f:
   f.write(resp_json_str)

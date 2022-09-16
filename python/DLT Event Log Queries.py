@@ -6,7 +6,7 @@
 
 # Fill in the pipelines_id, pipeline_name and storage_location
 pipelines_id = "" #used to find the event path if storage location is blank
-pipeline_name = "" 
+pipeline_name = ""
 storage_location = "" #may be blank, in which case, the pipelines_id is used for the event path
 
 from pyspark.sql.functions import *
@@ -18,11 +18,8 @@ from pyspark.sql.types import *
 
 event_location = ""
 
-if storage_location != "":
-  event_location = "dbfs:" + storage_location + "/system/events/"
-else:
-  event_location = "dbfs:/pipelines/" + pipelines_id + "/system/events/"
-  
+event_location = (f"dbfs:{storage_location}/system/events/" if storage_location
+                  else f"dbfs:/pipelines/{pipelines_id}/system/events/")
 event_location
 
 # COMMAND ----------
