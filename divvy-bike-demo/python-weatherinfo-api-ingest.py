@@ -64,13 +64,13 @@ for row in dataCollect:
   now = datetime.now() # current date and time
   fmt_now = now.strftime("%Y%m%d_%H-%M-%S")
   rec_cnt = rec_cnt + 1 # Increment counter
-  
+
   print('---------------------------------------------------')
   print('Processing Record Number: ', rec_cnt)
-  
+
   # Define the full API call for current record in the DataFrame
   full_url = url_part1 + str(row['lat']) + "&lon=" + str(row['lon']) + url_part2 + api_key
-  
+
   # Call API & get JSON response:
   resp = requests.get(full_url)
   if resp.status_code != 200:
@@ -82,11 +82,12 @@ for row in dataCollect:
   print("Byte size of JSON Response: ", len(resp_json_str))
 
   #Define full path + file name string
-  full_string = api_resp_path_weather + "/weather_info_" + fmt_now + "_station_" + row['station_id'] + ".json"
+  full_string = (f"{api_resp_path_weather}/weather_info_{fmt_now}_station_" +
+                 row['station_id'] + ".json")
 
   # Write to DBFS dir
   dbutils.fs.put(full_string, resp_json_str, True)
-    
+
   # Wait so we limit to 1 API call per second
   print(f"Sleeping for {sleep_time} seconds")
   time.sleep(sleep_time)

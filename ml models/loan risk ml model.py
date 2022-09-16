@@ -3,7 +3,7 @@
 targetName = "yourTargetDatabase"
 
 # get the training set from the Loan Risk DLT pipeline
-trainSql = "SELECT * FROM " + targetName + ".train_data"
+trainSql = f"SELECT * FROM {targetName}.train_data"
 train = spark.sql(trainSql)
 
 display(train)
@@ -20,9 +20,15 @@ categoricals = ["term", "home_ownership", "purpose", "addr_state","verification_
 numerics = ["loan_amnt", "emp_length", "annual_inc", "dti", "delinq_2yrs", "revol_util", "total_acc", "credit_length_in_years"]
 
 # Establish stages for our GBT model
-indexers = map(lambda c: StringIndexer(inputCol=c, outputCol=c+"_idx", handleInvalid = 'keep'), categoricals)
+indexers = map(
+    lambda c: StringIndexer(
+        inputCol=c, outputCol=f"{c}_idx", handleInvalid='keep'
+    ),
+    categoricals,
+)
+
 imputers = Imputer(inputCols = numerics, outputCols = numerics)
-featureCols = list(map(lambda c: c+"_idx", categoricals)) + numerics
+featureCols = list(map(lambda c: f"{c}_idx", categoricals)) + numerics
 
 # Define vector assemblers
 model_matrix_stages = list(indexers) + [imputers] + \

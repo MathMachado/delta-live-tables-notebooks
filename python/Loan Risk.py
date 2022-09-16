@@ -115,11 +115,7 @@ myX = categoricals + numerics
 def train_data():
   # Setup dataset
   features = dlt.read("features").select(myX + [myY, "int_rate", "net", "issue_year"])
-  train_data = features.filter(features.issue_year <= 2015)
-  
-  return (
-    train_data
-  )
+  return features.filter(features.issue_year <= 2015)
 
 
 # COMMAND ----------
@@ -133,8 +129,4 @@ def train_data():
 def valid_data():
   # Setup dataset
   features = dlt.read("features").select(myX + [myY, "int_rate", "net", "issue_year"])
-  valid_data = features.filter(features.issue_year > 2015)
-  
-  return (
-    valid_data
-  )
+  return features.filter(features.issue_year > 2015)

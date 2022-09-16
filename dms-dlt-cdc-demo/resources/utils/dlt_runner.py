@@ -10,12 +10,11 @@ def create_api_client(profile=''):
     try:
         if profile == '':
             config = EnvironmentVariableConfigProvider().get_config()
+        elif profile == 'default':
+            config = ProfileConfigProvider().get_config()
         else:
-            if profile == 'default':
-                config = ProfileConfigProvider().get_config()
-            else:
-                config = ProfileConfigProvider(profile).get_config()
-        
+            config = ProfileConfigProvider(profile).get_config()
+
         api_client = _get_api_client(config, command_name="blog-dms-cdc-demo")
     except:
         print("Failed to create api client.") 

@@ -19,7 +19,7 @@
 
 from pyspark.sql import functions as F
 from faker import Faker
-from collections import OrderedDict 
+from collections import OrderedDict
 import uuid
 
 folder = "/tmp/demo/cdc_raw"
@@ -27,7 +27,7 @@ folder = "/tmp/demo/cdc_raw"
 try:
   dbutils.fs.ls(folder)
 except:
-  print("folder doesn't exists, generating the data...")  
+  print("folder doesn't exists, generating the data...")
   fake = Faker()
   fake_firstname = F.udf(fake.first_name)
   fake_lastname = F.udf(fake.last_name)
@@ -47,8 +47,9 @@ except:
   df = df.withColumn("operation", fake_operation())
   df = df.withColumn("operation_date", fake_date())
 
-  df.repartition(100).write.format("json").mode("overwrite").save(folder+"/customers")
-  
+  df.repartition(100).write.format("json").mode("overwrite").save(
+      f"{folder}/customers")
+
   df = spark.range(0, 10000)
   df = df.withColumn("id", fake_id())
   df = df.withColumn("transaction_date", fake_date())
@@ -57,9 +58,15 @@ except:
   df = df.withColumn("operation", fake_operation())
   df = df.withColumn("operation_date", fake_date())
   #Join with the customer to get the same IDs generated.
-  df = df.withColumn("t_id", F.monotonically_increasing_id()).join(spark.read.json(folder+"/customers").select("id").withColumnRenamed("id", "customer_id").withColumn("t_id", F.monotonically_increasing_id()), "t_id").drop("t_id")
-  df.repartition(10).write.format("json").mode("overwrite").save(folder+"/transactions")
+  df = (df.withColumn("t_id", F.monotonically_increasing_id()).join(
+      spark.read.json(f"{folder}/customers").select("id").withColumnRenamed(
+          "id", "customer_id").withColumn("t_id",
+                                          F.monotonically_increasing_id()),
+      "t_id",
+  ).drop("t_id"))
+  df.repartition(10).write.format("json").mode("overwrite").save(
+      f"{folder}/transactions")
 
 # COMMAND ----------
 
-spark.read.json(folder+"/customers").display()
+spark.read.json(f"{folder}/customers").display()

@@ -77,13 +77,12 @@ class TweetStream(tweepy.Stream):
 
     def write_file(self):
         file_timestamp = calendar.timegm(time.gmtime())
-        fname = self.filename + '/tweets_' + str(file_timestamp) + '.json'
+        fname = f'{self.filename}/tweets_{str(file_timestamp)}.json'
 
 
-        f = open(fname, 'w')
-        for tweet in self.tweet_stack:
-            f.write(jsonpickle.encode(tweet._json, unpicklable=False) + '\n')
-        f.close()
+        with open(fname, 'w') as f:
+            for tweet in self.tweet_stack:
+                f.write(jsonpickle.encode(tweet._json, unpicklable=False) + '\n')
         print("Wrote local file ", fname)
 
     def on_error(self, status_code):

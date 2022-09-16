@@ -270,7 +270,7 @@ debezium_str = '''{{
   }}
 }}'''
 
-import numpy as np 
+import numpy as np
 from datetime import datetime, timedelta
 import math
 import calendar
@@ -282,7 +282,7 @@ resolved_list = {}
 for i in range(1, 200):
   time.sleep(1)
   print(resolved_list.keys())
-  if str(i%10) in resolved_list.keys():
+  if str(i % 10) in resolved_list:
     continue
   resolved = "N"
   curr_entry = debezium_str.format('2022-01-01', math.floor(math.log(i)+5), math.floor(math.log(i)), math.floor(math.log(i+10)), i, 'null', str(i%10), calendar.timegm((datetime.now()+timedelta(days=i)).timetuple())*1000, calendar.timegm((datetime.now()+timedelta(days=i)).timetuple())*1000, '2022-01-01', math.floor(math.log(i)+5), math.floor(math.log(i)), math.floor(math.log(i+10)), i, 'null', str(i%10), calendar.timegm((datetime.now()+timedelta(days=i)).timetuple())*1000, calendar.timegm((datetime.now()+timedelta(days=i)).timetuple())*1000, "i")
@@ -293,7 +293,11 @@ for i in range(1, 200):
     if resolved == "Y":
       resolved_list[str(i%10)] = "Y"
       curr_entry = debezium_str.format('2022-01-01', math.floor(math.log(i)+5), math.floor(math.log(i)), math.floor(math.log(i+10)), i, calendar.timegm((datetime.now()+timedelta(days=i)).timetuple())*1000, str(i%10), calendar.timegm((datetime.now()+timedelta(days=i)).timetuple())*1000, calendar.timegm((datetime.now()+timedelta(days=i)).timetuple())*1000, '2022-01-01', math.floor(math.log(i)+5), math.floor(math.log(i)), math.floor(math.log(i+10)), i, calendar.timegm((datetime.now()+timedelta(days=i)).timetuple())*1000, str(i%10), calendar.timegm((datetime.now()+timedelta(days=i)).timetuple())*1000, calendar.timegm((datetime.now()+timedelta(days=i)).timetuple())*1000, "u")
-  dbutils.fs.put("/home/fs/banking_personalization/customer_patterns_{}.json".format(str(i)), curr_entry, True)
+  dbutils.fs.put(
+      f"/home/fs/banking_personalization/customer_patterns_{str(i)}.json",
+      curr_entry,
+      True,
+  )
 
 # COMMAND ----------
 
@@ -380,20 +384,17 @@ import time
 
 from datetime import datetime
 curr_time = datetime.now()
-import pandas as pd 
+import pandas as pd
 import numpy as np
 pdf = pd.DataFrame({datetime.now()}, columns=['updt_ts'])
 
 debit_or_credit = np.random.uniform(0, 1, 1)
 df = spark.range(10).withColumn("customer_id", col("id")%10).withColumn("scheduled_payment", col("id")%2).withColumn("txn_amount", col("id")%100).withColumn("debit_or_credit", when(col("customer_id") <= 3, round(rand())).otherwise(0)).drop("id").join(spark.createDataFrame(pdf)).withColumn("initial_balance", when(col("customer_id")%4 == 0, lit(150000)).otherwise(lit(10000)))
 
-i = 0
-while i < 100:
+for i in range(100):
   time.sleep(1)
   pdf = pd.DataFrame({datetime.now()+timedelta(days=i)}, columns=['updt_ts'])
   df = df.union(spark.range(10).withColumn("id", col("id")+10*i).withColumn("customer_id", col("id")%10).withColumn("scheduled_payment", col("id")%2).withColumn("txn_amount", col("id")%100).withColumn("debit_or_credit", when(col("customer_id") <= 3, 1).otherwise(round(round(rand())))).drop("id").join(spark.createDataFrame(pdf)).withColumn("initial_balance", when(col("customer_id")%4 == 0, lit(150000)).otherwise(lit(10000))))
-  i =i+1
-
 # COMMAND ----------
 
 # DBTITLE 1,Stage Data in Delta Table
